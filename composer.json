@@ -29,7 +29,10 @@
             "AOE\\Tagging\\": "src/"
         }
     },
-    "keywords" : [
+    "bin": [
+        "bin/tagging"
+    ],
+    "keywords": [
         "GIT",
         "Subversion",
         "VCS",
