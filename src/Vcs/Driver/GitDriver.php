@@ -18,9 +18,14 @@ class GitDriver implements DriverInterface
     private $git;
 
     /**
-     * @var CliAdapter
+     * @var string
      */
-    private $adapter;
+    private $url;
+
+    /**
+     * @var string
+     */
+    private $executable;
 
     /**
      * @param string $url
@@ -28,11 +33,9 @@ class GitDriver implements DriverInterface
      */
     public function __construct($url, $executable = 'git')
     {
-        $this->git = new Git($url);
-        $this->adapter = $this->git->getAdapter();
-        if (null !== $executable) {
-            $this->adapter->setExecutable($executable);
-        }
+        $this->url = $url;
+        $this->executable = $executable;
+
     }
 
     /**
@@ -44,8 +47,8 @@ class GitDriver implements DriverInterface
      */
     public function tag($tag, $path)
     {
-        $this->git->getAdapter()->execute('tag', array($tag), $path);
-        $this->git->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
+        $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
+        $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
     }
 
     /**
@@ -56,10 +59,33 @@ class GitDriver implements DriverInterface
      */
     public function getLatestTag()
     {
-        $reference = call_user_func('end', array_values($this->git->tags()));
-        if ($reference instanceof Reference) {
-            return $reference->getName();
+        $tags = array();
+        foreach ($this->getGit()->tags() as $reference) {
+            /** @var Reference $reference */
+            $tags[] = $reference->getName();
         }
-        return '0.0.0';
+
+        usort($tags, 'version_compare');
+
+        if (empty($tags)) {
+            return '0.0.0';
+        }
+
+        return call_user_func('end', array_values($tags));
+    }
+
+    /**
+     * @return Git
+     */
+    protected function getGit()
+    {
+        if (null === $this->git) {
+            $this->git = new Git($this->url);
+            /** @var CliAdapter $adapter */
+            $adapter = $this->git->getAdapter();
+            $adapter->setExecutable($this->executable);
+        }
+
+        return $this->git;
     }
 }
