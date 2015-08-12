@@ -75,6 +75,21 @@ class GitDriver implements DriverInterface
     }
 
     /**
+     * @param string $tag
+     * @param string $path
+     * @return boolean
+     */
+    public function hasChangesSinceTag($tag, $path)
+    {
+        $diff = $this->getGit()->getAdapter()->execute('diff', array($tag), $path);
+        if (null === $diff) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * @return Git
      */
     protected function getGit()

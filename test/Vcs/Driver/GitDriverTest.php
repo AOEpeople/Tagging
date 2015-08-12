@@ -52,6 +52,84 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     */
+    public function shouldNotHaveChangesSinceTag()
+    {
+        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
+            ->getMock();
+
+        $adapter->expects($this->once())->method('execute')->with(
+            'diff',
+            array('0.2.5'),
+            '/home/my/vcs/repo'
+        )->will($this->returnValue(null));
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGit'))
+            ->getMock();
+
+        $driver->expects($this->once())->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $this->assertFalse($driver->hasChangesSinceTag('0.2.5', '/home/my/vcs/repo'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldHaveChangesSinceTag()
+    {
+        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
+            ->getMock();
+
+        $adapter->expects($this->once())->method('execute')->with(
+            'diff',
+            array('0.2.5'),
+            '/home/my/vcs/repo'
+        )->will($this->returnValue('diff --git a/TEST b/TEST
+index 56a6051..d2b3621 100644
+--- a/TEST
++++ b/TEST
+@@ -1 +1 @@
+-1
+\ No newline at end of file
++1asdf
+\ No newline at end of file'));
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGit'))
+            ->getMock();
+
+        $driver->expects($this->once())->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $this->assertTrue($driver->hasChangesSinceTag('0.2.5', '/home/my/vcs/repo'));
+    }
+
+    /**
+     * @test
      * @dataProvider references
      */
     public function shouldGetLatestVersion(array $references)

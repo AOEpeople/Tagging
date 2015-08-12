@@ -22,4 +22,13 @@ interface DriverInterface
      * @return string
      */
     public function getLatestTag();
+
+    /**
+     * Returns true if the repository has changed since the last tag.
+     *
+     * @param string $tag
+     * @param string $path
+     * @return boolean
+     */
+    public function hasChangesSinceTag($tag, $path);
 }
