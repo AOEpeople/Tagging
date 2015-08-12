@@ -81,7 +81,15 @@ class GitDriver implements DriverInterface
      */
     public function hasChangesSinceTag($tag, $path)
     {
-        $diff = $this->getGit()->getAdapter()->execute('diff', array($tag), $path);
+        try {
+            $diff = $this->getGit()->getAdapter()->execute('diff', array($tag), $path);
+        } catch (\RuntimeException $e) {
+            if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
+                return true;
+            }
+            throw $e;
+        }
+
         if (null === $diff) {
             return false;
         }
