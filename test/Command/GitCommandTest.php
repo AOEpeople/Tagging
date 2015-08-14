@@ -250,4 +250,87 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
             )
         );
     }
+
+    /**
+     * @test
+     */
+    public function shouldEvaluateVersionNumberIfChangesDetected()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag', 'commit'))
+            ->getMock();
+
+        $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
+        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
+
+        $gitDriver->expects($this->never())->method('commit');
+        $gitDriver->expects($this->never())->method('push');
+        $gitDriver->expects($this->never())->method('tag');
+
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--evaluate' => null
+            )
+        );
+
+        $this->assertRegExp(
+            '~^2\.7\.4$~',
+            $commandTester->getDisplay()
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function shouldEvaluateVersionNumberIfNoChangesDetected()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag', 'commit'))
+            ->getMock();
+
+        $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
+        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(false));
+
+        $gitDriver->expects($this->never())->method('commit');
+        $gitDriver->expects($this->never())->method('push');
+        $gitDriver->expects($this->never())->method('tag');
+
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--evaluate' => null
+            )
+        );
+
+        $this->assertEmpty($commandTester->getDisplay());
+    }
 }

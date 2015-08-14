@@ -40,6 +40,12 @@ class GitCommand extends Command
                 Version::INCREASE_PATCH
             )
             ->addOption(
+                'evaluate',
+                'e',
+                InputOption::VALUE_NONE,
+                'If set only the next version will outputted. If not changes detected, output is empty.'
+            )
+            ->addOption(
                 'commit-and-push',
                 'cap',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
@@ -67,6 +73,13 @@ class GitCommand extends Command
         $latest = $git->getLatestTag();
         $next = $version->increase($latest, $input->getOption('version-type'));
 
+        if ($input->getOption('evaluate')) {
+            if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
+                $output->write($next);
+            }
+            return;
+        }
+
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
             $output->writeln('<info>Latest Tag number is "' . $latest . '"</info>');
             $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
@@ -74,7 +87,7 @@ class GitCommand extends Command
 
         if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
 
-            foreach($input->getOption('commit-and-push') as $file) {
+            foreach ($input->getOption('commit-and-push') as $file) {
                 $git->commit($file, $input->getArgument('path'), $input->getOption('message'));
             }
 
