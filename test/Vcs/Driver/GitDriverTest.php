@@ -54,6 +54,53 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function shouldDeleteTagOnError()
+    {
+        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
+            ->getMock();
+
+        $adapter->expects($this->at(0))->method('execute')->with(
+            'tag',
+            array('0.2.5'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(1))->method('execute')->with(
+            'push',
+            array('origin', 'tag', '0.2.5'),
+            '/home/my/vcs/repo'
+        )->will($this->throwException(new \Exception('could not push to remote')));
+
+        $adapter->expects($this->at(2))->method('execute')->with(
+            'tag',
+            array('-d', '0.2.5'),
+            '/home/my/vcs/repo'
+        );
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->exactly(3))->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGit'))
+            ->getMock();
+
+        $driver->expects($this->exactly(3))->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $driver->tag('0.2.5', '/home/my/vcs/repo');
+    }
+
+    /**
+     * @test
+     */
     public function shouldNotHaveChangesSinceTag()
     {
         $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')

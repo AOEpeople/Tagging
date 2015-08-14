@@ -47,8 +47,15 @@ class GitDriver implements DriverInterface
      */
     public function tag($tag, $path)
     {
-        $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-        $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
+        try {
+            $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
+            $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
+        } catch (\Exception $e) {
+            try {
+                $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
+            }catch (\Exception $e) {
+            }
+        }
     }
 
     /**
