@@ -2,7 +2,6 @@
 namespace AOE\Tagging\Tests\Vcs\Driver;
 
 use AOE\Tagging\Vcs\Driver\GitDriver;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Webcreate\Vcs\Common\Reference;
 
 /**
@@ -236,6 +235,53 @@ index 56a6051..d2b3621 100644
 
         /** @var GitDriver $driver */
         $this->assertEquals('0.12.0', $driver->getLatestTag());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCommitFile()
+    {
+        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
+            ->getMock();
+
+        $adapter->expects($this->at(0))->method('execute')->with(
+            'add',
+            array('myfile.ext'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(1))->method('execute')->with(
+            'commit',
+            array('-m', 'my message', 'myfile.ext'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(2))->method('execute')->with(
+            'push',
+            array('origin', 'master'),
+            '/home/my/vcs/repo'
+        );
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->exactly(3))->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGit'))
+            ->getMock();
+
+        $driver->expects($this->exactly(3))->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $driver->commit('myfile.ext', '/home/my/vcs/repo', 'my message');
     }
 
     /**

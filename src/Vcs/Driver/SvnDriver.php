@@ -7,8 +7,6 @@ namespace AOE\Tagging\Vcs\Driver;
 class SvnDriver implements DriverInterface
 {
     /**
-     * Creates a Tag and push the specific tag into the remote.
-     *
      * @param string $tag
      * @param string $path
      * @return void
@@ -19,13 +17,31 @@ class SvnDriver implements DriverInterface
     }
 
     /**
-     * Returns the latest tag from the given repository.
-     * If no tag can be evaluated it will return "0.0.0".
-     *
      * @return string
      */
     public function getLatestTag()
     {
         // TODO: Implement getLatestTag() method.
+    }
+
+    /**
+     * @param string $tag
+     * @param string $path
+     * @return boolean
+     */
+    public function hasChangesSinceTag($tag, $path)
+    {
+        // TODO: Implement hasChangesSinceTag() method.
+    }
+
+    /**
+     * @param string $file
+     * @param string $path
+     * @param string $message
+     * @return void
+     */
+    public function commit($file, $path, $message = '')
+    {
+        // TODO: Implement commit() method.
     }
 }

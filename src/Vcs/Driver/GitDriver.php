@@ -35,12 +35,9 @@ class GitDriver implements DriverInterface
     {
         $this->url = $url;
         $this->executable = $executable;
-
     }
 
     /**
-     * Creates a Tag and push the specific tag into the remote.
-     *
      * @param string $tag
      * @param string $path
      * @return void
@@ -53,15 +50,25 @@ class GitDriver implements DriverInterface
         } catch (\Exception $e) {
             try {
                 $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
-            }catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
 
     /**
-     * Returns the latest tag from the given repository.
-     * If no tag can be evaluated it will return "0.0.0".
-     *
+     * @param string $file
+     * @param string $path
+     * @param string $message
+     * @return void
+     */
+    public function commit($file, $path, $message = '')
+    {
+        $this->getGit()->getAdapter()->execute('add', array($file), $path);
+        $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
+        $this->getGit()->getAdapter()->execute('push', array('origin', 'master'), $path);
+    }
+
+    /**
      * @return string
      */
     public function getLatestTag()

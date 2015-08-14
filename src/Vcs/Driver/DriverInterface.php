@@ -31,4 +31,14 @@ interface DriverInterface
      * @return boolean
      */
     public function hasChangesSinceTag($tag, $path);
+
+    /**
+     * Commits given file into the remote repository.
+     *
+     * @param string $file
+     * @param string $path
+     * @param string $message
+     * @return void
+     */
+    public function commit($file, $path, $message = '');
 }

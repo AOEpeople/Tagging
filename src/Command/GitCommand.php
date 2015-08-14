@@ -38,6 +38,19 @@ class GitCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'define the version type which will be used to increment (major, minor or patch)',
                 Version::INCREASE_PATCH
+            )
+            ->addOption(
+                'commit-and-push',
+                'cap',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'define files which should commited and pushed before creating a tag'
+            )
+            ->addOption(
+                'message',
+                'm',
+                InputOption::VALUE_REQUIRED,
+                'commit message if "commit-and-push" is used',
+                ''
             );
     }
 
@@ -60,6 +73,11 @@ class GitCommand extends Command
         }
 
         if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
+
+            foreach($input->getOption('commit-and-push') as $file) {
+                $git->commit($file, $input->getArgument('path'), $input->getOption('message'));
+            }
+
             $git->tag($next, $input->getArgument('path'));
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
