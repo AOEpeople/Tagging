@@ -51,7 +51,7 @@ for example:
 By default the version will be increased by the "patch" version. For example: 0.2.5 will be increased to 0.2.6.
 You can configure which version type you want to increase by setting the `--version-type` option
 
-    php bin/tagging https://github.com/company/package.git /path/to/local/checkout --version-type=minor
+    php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --version-type=minor
     
 In the example above the minor version will be increased. For example: 0.2.5 will be increased tp 0.3.0.
 
@@ -65,16 +65,16 @@ In some cases it is useful to commit (and push) a file into the remote before a 
 For example if you have a version file within your repository that must be updated before creating a new tag/version.
 If you need to commit (and push) files into the remote, just add the `--commit-and-push` option. The value is required and must contain the relative path to the file that should be commited.
 
-    php bin/tagging https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt
+    php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt
 
 The above example will commit (and push) the file "version.txt" into the remote before creating a new tag/version.
 
 If you want to customize the message vor the commit, just append the `--message` option and specify the message as value.
 By default the message is empty.
 
-    php bin/tagging https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt --message="my custom commit message"
+    php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt --message="my custom commit message"
 
 ### Evaluate (dry run)
 You can set the `--evaluate` option to find out which tag/version will be created. If set, nothing is really done. You just get an output of the next version/tag.
 
-    php bin/tagging https://github.com/company/package.git /path/to/local/checkout --evaluate
+    php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --evaluate
