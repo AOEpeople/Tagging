@@ -75,6 +75,6 @@ By default the message is empty.
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt --message="my custom commit message"
 
 ### Evaluate (dry run)
-You can set the `--evaluate` option to find out which tag/version will be created. If set, nothing is really done. You just get an output of the next version/tag.
+You can set the `--evaluate` option to find out which tag/version will be created. If set, nothing is really done. You just get an output of the next version/tag that would be created without the evaluate option.
 
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --evaluate
