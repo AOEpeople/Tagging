@@ -260,6 +260,12 @@ index 56a6051..d2b3621 100644
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
+            'pull',
+            array('--rebase'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
             'push',
             array('origin'),
             '/home/my/vcs/repo'
@@ -269,14 +275,14 @@ index 56a6051..d2b3621 100644
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(3))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
             ->setMethods(array('getGit'))
             ->getMock();
 
-        $driver->expects($this->exactly(3))->method('getGit')->will(
+        $driver->expects($this->exactly(4))->method('getGit')->will(
             $this->returnValue($git)
         );
 

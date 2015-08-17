@@ -65,6 +65,7 @@ class GitDriver implements DriverInterface
     {
         $this->getGit()->getAdapter()->execute('add', array($file), $path);
         $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
+        $this->getGit()->getAdapter()->execute('pull', array('--rebase'), $path);
         $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
     }
 
