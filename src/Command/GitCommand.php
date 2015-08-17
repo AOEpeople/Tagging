@@ -77,6 +77,7 @@ class GitCommand extends Command
             if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
                 $output->write($next);
             }
+
             return;
         }
 
@@ -88,6 +89,11 @@ class GitCommand extends Command
         if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
 
             foreach ($input->getOption('commit-and-push') as $file) {
+                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                    $output->writeln(
+                        '<info>commit and push: "' . $file . '"</info>'
+                    );
+                }
                 $git->commit($file, $input->getArgument('path'), $input->getOption('message'));
             }
 
