@@ -261,7 +261,7 @@ index 56a6051..d2b3621 100644
 
         $adapter->expects($this->at(2))->method('execute')->with(
             'push',
-            array('origin', 'master'),
+            array('origin'),
             '/home/my/vcs/repo'
         );
 

@@ -81,11 +81,6 @@ class GitCommand extends Command
             return;
         }
 
-        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-            $output->writeln('<info>Latest Tag number is "' . $latest . '"</info>');
-            $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
-        }
-
         if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
 
             foreach ($input->getOption('commit-and-push') as $file) {
@@ -95,6 +90,11 @@ class GitCommand extends Command
                     );
                 }
                 $git->commit($file, $input->getArgument('path'), $input->getOption('message'));
+            }
+
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $output->writeln('<info>Latest Tag number is "' . $latest . '"</info>');
+                $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
             }
 
             $git->tag($next, $input->getArgument('path'));
