@@ -53,7 +53,7 @@ You can configure which version type you want to increase by setting the `--vers
 
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --version-type=minor
     
-In the example above the minor version will be increased. For example: 0.2.5 will be increased tp 0.3.0.
+In the example above the minor version will be increased. For example: 0.2.5 will be increased to 0.3.0.
 
 Allowed version types are:
  - major
@@ -69,7 +69,7 @@ If you need to commit (and push) files into the remote, just add the `--commit-a
 
 The above example will commit (and push) the file "version.txt" into the remote before creating a new tag/version.
 
-If you want to customize the message vor the commit, just append the `--message` option and specify the message as value.
+If you want to customize the message for the commit, just append the `--message` option and specify the message as value.
 By default the message is empty.
 
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt --message="my custom commit message"
