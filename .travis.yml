@@ -8,3 +8,5 @@ php:
   - hhvm
 
 phpunit:
+
+install: composer install
