@@ -1,4 +1,6 @@
-# Tagging 
+[![Build Status](https://travis-ci.org/AOEpeople/Tagging.svg?branch=master)](https://travis-ci.org/AOEpeople/Tagging)
+
+# Tagging
 
 This PHP library provide the functionality to automatic create a new tag/version in a remote VCS repository dependending on the last created tag/version. It follows the semantic versioning pattern: http://semver.org/
 You are be able configure the version type to increase. For example "major" or "minor" increasement.
