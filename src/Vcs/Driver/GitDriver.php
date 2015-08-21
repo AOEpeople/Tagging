@@ -40,18 +40,20 @@ class GitDriver implements DriverInterface
     /**
      * @param string $tag
      * @param string $path
+     * @throws \Exception
      * @return void
      */
     public function tag($tag, $path)
     {
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
+            $this->getGit()->getAdapter()->execute('pull', array('--rebase'), $path);
+            $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
-            try {
-                $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
-            } catch (\Exception $e) {
-            }
+            $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
+            $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
+            throw $e;
         }
     }
 
@@ -65,9 +67,6 @@ class GitDriver implements DriverInterface
     {
         $this->getGit()->getAdapter()->execute('add', array($file), $path);
         $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
-        /* @TODO: create branch instead of pull - otherwise you maybe get new changes from remote that are not tested*/
-        $this->getGit()->getAdapter()->execute('pull', array('--rebase'), $path);
-        $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
     }
 
     /**

@@ -26,6 +26,18 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
+            'pull',
+            array('--rebase'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(2))->method('execute')->with(
+            'push',
+            array('origin'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
             'push',
             array('origin', 'tag', '0.2.5'),
             '/home/my/vcs/repo'
@@ -35,14 +47,14 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(2))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
             ->setMethods(array('getGit'))
             ->getMock();
 
-        $driver->expects($this->exactly(2))->method('getGit')->will(
+        $driver->expects($this->exactly(4))->method('getGit')->will(
             $this->returnValue($git)
         );
 
@@ -52,8 +64,9 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @expectedException \Exception
      */
-    public function shouldDeleteTagOnError()
+    public function shouldCleanOnError()
     {
         $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
             ->disableOriginalConstructor()
@@ -67,14 +80,26 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
+            'pull',
+            array('--rebase'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(2))->method('execute')->with(
             'push',
-            array('origin', 'tag', '0.2.5'),
+            array('origin'),
             '/home/my/vcs/repo'
         )->will($this->throwException(new \Exception('could not push to remote')));
 
-        $adapter->expects($this->at(2))->method('execute')->with(
+        $adapter->expects($this->at(3))->method('execute')->with(
             'tag',
             array('-d', '0.2.5'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(4))->method('execute')->with(
+            'reset',
+            array('--hard'),
             '/home/my/vcs/repo'
         );
 
@@ -82,14 +107,14 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(3))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(5))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
             ->setMethods(array('getGit'))
             ->getMock();
 
-        $driver->expects($this->exactly(3))->method('getGit')->will(
+        $driver->expects($this->exactly(5))->method('getGit')->will(
             $this->returnValue($git)
         );
 
@@ -190,8 +215,8 @@ index 56a6051..d2b3621 100644
             array('0.2.5'),
             '/home/my/vcs/repo'
         )->will($this->throwException(
-            new \RuntimeException('ambiguous argument \'0.0.0\': unknown revision or path not in the working tree.'))
-        );
+            new \RuntimeException('ambiguous argument \'0.0.0\': unknown revision or path not in the working tree.')
+        ));
 
         $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
             ->disableOriginalConstructor()
@@ -213,6 +238,7 @@ index 56a6051..d2b3621 100644
     }
 
     /**
+     * @param array $references
      * @test
      * @dataProvider references
      */
@@ -259,30 +285,18 @@ index 56a6051..d2b3621 100644
             '/home/my/vcs/repo'
         );
 
-        $adapter->expects($this->at(2))->method('execute')->with(
-            'pull',
-            array('--rebase'),
-            '/home/my/vcs/repo'
-        );
-
-        $adapter->expects($this->at(3))->method('execute')->with(
-            'push',
-            array('origin'),
-            '/home/my/vcs/repo'
-        );
-
         $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(2))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
             ->setMethods(array('getGit'))
             ->getMock();
 
-        $driver->expects($this->exactly(4))->method('getGit')->will(
+        $driver->expects($this->exactly(2))->method('getGit')->will(
             $this->returnValue($git)
         );
 

@@ -192,8 +192,8 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
         $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
-        $gitDriver->expects($this->once())->method('commit')->with('myfile.ext', '/home/foo/bar',
-            'my message for commit');
+        $gitDriver->expects($this->once())->method('commit')
+            ->with('myfile.ext', '/home/foo/bar', 'my message for commit');
         $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
             ->setMethods(array('getDriver'))
             ->getMock();
