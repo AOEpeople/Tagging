@@ -7,6 +7,10 @@ php:
   - 5.6
   - hhvm
 
-phpunit:
+install:
+  - composer self-update
+  - composer install
 
-install: composer install
+script:
+  - ./vendor/bin/phpunit --colors -c phpunit.xml --coverage-clover=unittest-coverage.clover
+  - ./vendor/bin/phpcs --standard=psr2 ./src
