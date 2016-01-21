@@ -48,7 +48,7 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             try {
-                $this->getGit()->getAdapter()->execute('pull', array('--rebase'), $path);
+                $this->getGit()->getAdapter()->execute('pull', array(), $path);
             } catch (\Exception $e) {
                 //$this->getGit()->getAdapter()->execute('rebase', array('--abort'), $path);
                 throw $e;
