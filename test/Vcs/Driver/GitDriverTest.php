@@ -128,6 +128,8 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldAbortRebaseOnPullError()
     {
+        $this->markTestSkipped('currently rebase abort is disabled');
+
         $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
             ->disableOriginalConstructor()
             ->setMethods(array('tag', 'push', 'execute', 'setClient'))
