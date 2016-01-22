@@ -27,7 +27,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'pull',
-            array('--rebase'),
+            array(),
             '/home/my/vcs/repo'
         );
 
@@ -81,7 +81,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'pull',
-            array('--rebase'),
+            array(),
             '/home/my/vcs/repo'
         );
 
@@ -143,7 +143,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'pull',
-            array('--rebase'),
+            array(),
             '/home/my/vcs/repo'
         )->will($this->throwException(new \Exception('could not push to remote')));
 
@@ -184,7 +184,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
-            array('0.2.5'),
+            array('--ignore-all-space', '0.2.5'),
             '/home/my/vcs/repo'
         )->will($this->returnValue(null));
 
@@ -219,7 +219,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
-            array('0.2.5'),
+            array('--ignore-all-space', '0.2.5'),
             '/home/my/vcs/repo'
         )->will($this->returnValue('diff --git a/TEST b/TEST
 index 56a6051..d2b3621 100644
@@ -262,7 +262,7 @@ index 56a6051..d2b3621 100644
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
-            array('0.2.5'),
+            array('--ignore-all-space', '0.2.5'),
             '/home/my/vcs/repo'
         )->will($this->throwException(
             new \RuntimeException('ambiguous argument \'0.0.0\': unknown revision or path not in the working tree.')

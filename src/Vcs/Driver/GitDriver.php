@@ -47,12 +47,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-            try {
-                $this->getGit()->getAdapter()->execute('pull', array(), $path);
-            } catch (\Exception $e) {
-                //$this->getGit()->getAdapter()->execute('rebase', array('--abort'), $path);
-                throw $e;
-            }
+            $this->getGit()->getAdapter()->execute('pull', array(), $path);
             $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
@@ -102,7 +97,7 @@ class GitDriver implements DriverInterface
     public function hasChangesSinceTag($tag, $path)
     {
         try {
-            $diff = $this->getGit()->getAdapter()->execute('diff', array($tag), $path);
+            $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
                 return true;
