@@ -307,10 +307,9 @@ index 56a6051..d2b3621 100644
     }
 
     /**
-     * @test
-     * @expectedException Exception
-     */
-    public function shouldGetExceptionWhenCommitFails(){
+ * @test
+ */
+    public function shouldIgnoreException(){
         $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->at(0))->method('execute')->with(
@@ -324,6 +323,36 @@ index 56a6051..d2b3621 100644
             array('-m', 'my message', 'myfile.ext'),
             '/home/my/vcs/repo'
         )->willThrowException(new \Exception('nothing to commit (working directory clean)'));
+
+        $git = $this->givenAGitClient($adapter);
+
+        $driver = $this->givenADriver();
+
+        $driver->expects($this->exactly(2))->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        $driver->commit('myfile.ext', '/home/my/vcs/repo', 'my message');
+    }
+
+    /**
+     * @test
+     * @expectedException Exception
+     */
+    public function shouldThrowException(){
+        $adapter = $this->givenAnAdapter();
+
+        $adapter->expects($this->at(0))->method('execute')->with(
+            'add',
+            array('myfile.ext'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(1))->method('execute')->with(
+            'commit',
+            array('-m', 'my message', 'myfile.ext'),
+            '/home/my/vcs/repo'
+        )->willThrowException(new \Exception('Some other error'));
 
         $git = $this->givenAGitClient($adapter);
 

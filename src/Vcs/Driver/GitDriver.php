@@ -70,9 +70,9 @@ class GitDriver implements DriverInterface
             $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
         } catch (\Exception $e) {
             if (false === strpos($e->getMessage(), 'nothing to commit')) {
-               return ;
+                throw $e;
             }
-            throw $e;
+
         }
     }
 
