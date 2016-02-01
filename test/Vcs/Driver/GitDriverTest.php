@@ -2,6 +2,7 @@
 namespace AOE\Tagging\Tests\Vcs\Driver;
 
 use AOE\Tagging\Vcs\Driver\GitDriver;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Webcreate\Vcs\Common\Reference;
 
 /**
@@ -14,10 +15,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldTagAndPush()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'tag',
@@ -49,10 +47,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->exactly(4))->method('getGit')->will(
             $this->returnValue($git)
@@ -68,10 +63,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldCleanOnError()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'tag',
@@ -109,10 +101,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $git->expects($this->exactly(5))->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->exactly(5))->method('getGit')->will(
             $this->returnValue($git)
@@ -130,10 +119,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestSkipped('currently rebase abort is disabled');
 
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'tag',
@@ -159,10 +145,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $git->expects($this->exactly(5))->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->exactly(5))->method('getGit')->will(
             $this->returnValue($git)
@@ -177,10 +160,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldNotHaveChangesSinceTag()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
@@ -194,10 +174,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->once())->method('getGit')->will(
             $this->returnValue($git)
@@ -212,10 +189,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldHaveChangesSinceTag()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
@@ -237,10 +211,7 @@ index 56a6051..d2b3621 100644
             ->getMock();
         $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->once())->method('getGit')->will(
             $this->returnValue($git)
@@ -255,10 +226,7 @@ index 56a6051..d2b3621 100644
      */
     public function shouldHaveChangesSinceTagOnUnknownTag()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->once())->method('execute')->with(
             'diff',
@@ -274,10 +242,7 @@ index 56a6051..d2b3621 100644
             ->getMock();
         $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->once())->method('getGit')->will(
             $this->returnValue($git)
@@ -300,10 +265,7 @@ index 56a6051..d2b3621 100644
             ->getMock();
         $git->expects($this->once())->method('tags')->will($this->returnValue($references));
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->once())->method('getGit')->will(
             $this->returnValue($git)
@@ -318,10 +280,7 @@ index 56a6051..d2b3621 100644
      */
     public function shouldCommitFile()
     {
-        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
-            ->disableOriginalConstructor()
-            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
-            ->getMock();
+        $adapter = $this->givenAnAdapter();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'add',
@@ -335,16 +294,9 @@ index 56a6051..d2b3621 100644
             '/home/my/vcs/repo'
         );
 
-        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getAdapter'))
-            ->getMock();
-        $git->expects($this->exactly(2))->method('getAdapter')->will($this->returnValue($adapter));
+        $git = $this->givenAGitClient($adapter);
 
-        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getGit'))
-            ->getMock();
+        $driver = $this->givenADriver();
 
         $driver->expects($this->exactly(2))->method('getGit')->will(
             $this->returnValue($git)
@@ -354,6 +306,35 @@ index 56a6051..d2b3621 100644
         $driver->commit('myfile.ext', '/home/my/vcs/repo', 'my message');
     }
 
+    /**
+     * @test
+     * @expectedException Exception
+     */
+    public function shouldGetExceptionWhenCommitFails(){
+        $adapter = $this->givenAnAdapter();
+
+        $adapter->expects($this->at(0))->method('execute')->with(
+            'add',
+            array('myfile.ext'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(1))->method('execute')->with(
+            'commit',
+            array('-m', 'my message', 'myfile.ext'),
+            '/home/my/vcs/repo'
+        )->willThrowException(new \Exception('nothing to commit (working directory clean)'));
+
+        $git = $this->givenAGitClient($adapter);
+
+        $driver = $this->givenADriver();
+
+        $driver->expects($this->exactly(2))->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        $driver->commit('myfile.ext', '/home/my/vcs/repo', 'my message');
+    }
     /**
      * @return array
      */
@@ -393,5 +374,43 @@ index 56a6051..d2b3621 100644
                 )
             )
         );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenAnAdapter()
+    {
+        $adapter = $this->getMockBuilder('Webcreate\\Vcs\\Common\\Adapter\\AdapterInterface')
+            ->disableOriginalConstructor()
+            ->setMethods(array('tag', 'push', 'execute', 'setClient'))
+            ->getMock();
+        return $adapter;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenADriver()
+    {
+        $driver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getGit'))
+            ->getMock();
+        return $driver;
+    }
+
+    /**
+     * @param $adapter
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function givenAGitClient($adapter)
+    {
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->exactly(2))->method('getAdapter')->will($this->returnValue($adapter));
+        return $git;
     }
 }

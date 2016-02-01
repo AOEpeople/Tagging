@@ -47,7 +47,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-            $this->getGit()->getAdapter()->execute('pull', array('--rebase'), $path);
+            $this->getGit()->getAdapter()->execute('pull', array(), $path);
             $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
@@ -61,12 +61,19 @@ class GitDriver implements DriverInterface
      * @param string $file
      * @param string $path
      * @param string $message
-     * @return void
+     * @throws \Exception
      */
     public function commit($file, $path, $message = '')
     {
         $this->getGit()->getAdapter()->execute('add', array($file), $path);
-        $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
+        try {
+            $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
+        } catch (\Exception $e) {
+            if (false === strpos($e->getMessage(), 'nothing to commit')) {
+               return ;
+            }
+            throw $e;
+        }
     }
 
     /**
