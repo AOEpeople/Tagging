@@ -33,12 +33,12 @@ interface DriverInterface
     public function hasChangesSinceTag($tag, $path);
 
     /**
-     * Commits given file into the remote repository.
+     * Commits given files into the remote repository.
      *
-     * @param string $file
+     * @param array $files
      * @param string $path
      * @param string $message
      * @return void
      */
-    public function commit($file, $path, $message = '');
+    public function commit(array $files, $path, $message = '');
 }

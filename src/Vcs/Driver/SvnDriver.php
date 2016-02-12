@@ -35,12 +35,12 @@ class SvnDriver implements DriverInterface
     }
 
     /**
-     * @param string $file
+     * @param array $files
      * @param string $path
      * @param string $message
      * @return void
      */
-    public function commit($file, $path, $message = '')
+    public function commit(array $files, $path, $message = '')
     {
         // TODO: Implement commit() method.
     }

@@ -118,7 +118,7 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldCommitAdditionalFiles()
+    public function shouldCommitAdditionalFile()
     {
         $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
@@ -126,7 +126,7 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
         $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
-        $gitDriver->expects($this->once())->method('commit')->with('myfile.ext', '/home/foo/bar', '');
+        $gitDriver->expects($this->once())->method('commit')->with(array('myfile.ext'), '/home/foo/bar', '');
         $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
             ->setMethods(array('getDriver'))
             ->getMock();
@@ -144,6 +144,46 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
                 'url' => 'git@git.test.test/foo/bar',
                 'path' => '/home/foo/bar',
                 '--commit-and-push' => array('myfile.ext'),
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCommitAdditionalFiles()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag', 'commit'))
+            ->getMock();
+        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
+        $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
+        $gitDriver->expects($this->once())->method('commit')->with(
+            array(
+                'myfile.ext',
+                'onemorefile.ext'
+            ),
+            '/home/foo/bar',
+            ''
+        );
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--commit-and-push' => array('myfile.ext', 'onemorefile.ext')
             )
         );
     }
@@ -184,7 +224,7 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldCommitAdditionalFilesWithMessage()
+    public function shouldCommitAdditionalFileWithMessage()
     {
         $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
             ->disableOriginalConstructor()
@@ -193,7 +233,7 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
         $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
         $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
         $gitDriver->expects($this->once())->method('commit')
-            ->with('myfile.ext', '/home/foo/bar', 'my message for commit');
+            ->with(array('myfile.ext'), '/home/foo/bar', 'my message for commit');
         $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
             ->setMethods(array('getDriver'))
             ->getMock();
@@ -212,41 +252,6 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
                 'path' => '/home/foo/bar',
                 '--commit-and-push' => array('myfile.ext'),
                 '--message' => 'my message for commit'
-            )
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function shouldCommitMultipleAdditionalFiles()
-    {
-        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag', 'commit'))
-            ->getMock();
-        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
-        $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
-        $gitDriver->expects($this->at(2))->method('commit')->with('myfile.ext', '/home/foo/bar', '');
-        $gitDriver->expects($this->at(3))->method('commit')->with('mysecondfile.ext', '/home/foo/bar', '');
-        $gitDriver->expects($this->at(4))->method('commit')->with('mythirdfile.ext', '/home/foo/bar', '');
-        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
-            ->setMethods(array('getDriver'))
-            ->getMock();
-        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
-
-        /** @var GitCommand $gitCommand */
-        $application = new Application();
-        $application->add($gitCommand);
-
-        $command = $application->find('git');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            array(
-                'command' => $command->getName(),
-                'url' => 'git@git.test.test/foo/bar',
-                'path' => '/home/foo/bar',
-                '--commit-and-push' => array('myfile.ext', 'mysecondfile.ext', 'mythirdfile.ext')
             )
         );
     }

@@ -58,21 +58,24 @@ class GitDriver implements DriverInterface
     }
 
     /**
-     * @param string $file
+     * @param array $files
      * @param string $path
      * @param string $message
      * @throws \Exception
      */
-    public function commit($file, $path, $message = '')
+    public function commit(array $files, $path, $message = '')
     {
-        $this->getGit()->getAdapter()->execute('add', array($file), $path);
         try {
-            $this->getGit()->getAdapter()->execute('commit', array('-m', $message, $file), $path);
+            $this->getGit()->getAdapter()->execute('add', $files, $path);
+            $this->getGit()->getAdapter()->execute('commit', array_merge(array('-m', $message), $files), $path);
         } catch (\Exception $e) {
-            if (false === strpos($e->getMessage(), 'nothing to commit')) {
-                throw $e;
+            if (false !== strpos($e->getMessage(), 'nothing to commit')) {
+                return;
             }
-
+            if (false !== strpos($e->getMessage(), 'nothing added to commit')) {
+                return;
+            }
+            throw $e;
         }
     }
 

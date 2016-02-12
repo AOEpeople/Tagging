@@ -82,13 +82,13 @@ class GitCommand extends Command
         }
 
         if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
-            foreach ($input->getOption('commit-and-push') as $file) {
+            if($input->getOption('commit-and-push')) {
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(
-                        '<info>commit and push: "' . $file . '"</info>'
+                        '<info>commit and push: "' . implode(' ', $input->getOption('commit-and-push')) . '"</info>'
                     );
                 }
-                $git->commit($file, $input->getArgument('path'), $input->getOption('message'));
+                $git->commit($input->getOption('commit-and-push'), $input->getArgument('path'), $input->getOption('message'));
             }
 
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
