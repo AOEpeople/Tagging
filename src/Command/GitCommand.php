@@ -57,6 +57,13 @@ class GitCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'commit message if "commit-and-push" is used',
                 ''
+            )
+            ->addOption(
+                'from-version',
+                'fm',
+                InputOption::VALUE_REQUIRED,
+                'If set, the new version will be generated from beginning of this given version number.',
+                ''
             );
     }
 
@@ -70,7 +77,11 @@ class GitCommand extends Command
         $git = $this->getDriver($input->getArgument('url'));
         $version = new Version();
 
-        $latest = $git->getLatestTag();
+        if ($input->getOption('from-version')) {
+            $latest = $input->getOption('from-version');
+        }else {
+            $latest = $git->getLatestTag();
+        }
         $next = $version->increase($latest, $input->getOption('version-type'));
 
         if ($input->getOption('evaluate')) {

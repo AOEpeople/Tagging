@@ -79,6 +79,43 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function executeWithFromVersion()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag'))
+            ->getMock();
+        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
+        $gitDriver->expects($this->never())->method('getLatestTag');
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--from-version' => '2.0.7'
+            ),
+            array(
+                'verbosity' => OutputInterface::VERBOSITY_VERBOSE
+            )
+        );
+
+        $this->assertRegExp('/Next Tag number is "2.0.8"/', $commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
     public function executeVerboseWithNoChanges()
     {
         $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
