@@ -79,7 +79,7 @@ class GitCommand extends Command
 
         if ($input->getOption('from-version')) {
             $latest = $input->getOption('from-version');
-        }else {
+        } else {
             $latest = $git->getLatestTag();
         }
         $next = $version->increase($latest, $input->getOption('version-type'));
