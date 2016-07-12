@@ -76,6 +76,16 @@ By default the message is empty.
 
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --commit-and-push=version.txt --message="my custom commit message"
 
+### Custom start version
+Sometimes you need to define from which version the new one is generated. For example you have the following already existing versions:
+ - 1.1.0
+ - 1.2.0
+ 
+But you need to create a patch version for 1.1.0 (1.1.1). Since this library is always using your latest version for increasing it will create a patch version for 1.2.0 (1.2.1).
+To avoid this it is possible to specify a start version  by setting the option `--from-versiom` with the value `1.1.0`. This will create the version 1.1.1.
+
+    php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --from-versiom=1.1.0
+
 ### Evaluate (dry run)
 You can set the `--evaluate` option to find out which tag/version will be created. If set, nothing is really done. You just get an output of the next version/tag that would be created without the evaluate option.
 
