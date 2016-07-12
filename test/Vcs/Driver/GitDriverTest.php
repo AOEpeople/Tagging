@@ -73,13 +73,13 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'pull',
-            array(),
+            array('origin', 'master'),
             '/home/my/vcs/repo'
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
             'push',
-            array('origin'),
+            array('origin', 'master'),
             '/home/my/vcs/repo'
         )->will($this->throwException(new \Exception('could not push to remote')));
 
@@ -108,7 +108,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         /** @var GitDriver $driver */
-        $driver->tag('0.2.5', '/home/my/vcs/repo', null);
+        $driver->tag('0.2.5', '/home/my/vcs/repo', 'master');
     }
 
     /**

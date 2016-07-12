@@ -69,7 +69,8 @@ class GitCommand extends Command
                 'branch',
                 'b',
                 InputOption::VALUE_REQUIRED,
-                'Branch-Name: which will be use for tagging the branch'
+                'Branch-Name: which will be use for tagging the branch',
+                'master'
             );
     }
 
