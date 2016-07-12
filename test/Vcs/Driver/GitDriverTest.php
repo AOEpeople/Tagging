@@ -25,13 +25,13 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'pull',
-            array(),
+            array('origin', 'feature/myBranch'),
             '/home/my/vcs/repo'
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
             'push',
-            array('origin'),
+            array('origin', 'feature/myBranch'),
             '/home/my/vcs/repo'
         );
 
@@ -54,7 +54,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         /** @var GitDriver $driver */
-        $driver->tag('0.2.5', '/home/my/vcs/repo');
+        $driver->tag('0.2.5', '/home/my/vcs/repo', 'feature/myBranch');
     }
 
     /**
@@ -108,7 +108,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         /** @var GitDriver $driver */
-        $driver->tag('0.2.5', '/home/my/vcs/repo');
+        $driver->tag('0.2.5', '/home/my/vcs/repo', null);
     }
 
     /**

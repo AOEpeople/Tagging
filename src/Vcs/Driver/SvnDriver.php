@@ -9,9 +9,10 @@ class SvnDriver implements DriverInterface
     /**
      * @param string $tag
      * @param string $path
+     * @param string $branch
      * @return void
      */
-    public function tag($tag, $path)
+    public function tag($tag, $path, $branch)
     {
         // TODO: Implement tag() method.
     }

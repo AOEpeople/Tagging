@@ -40,15 +40,22 @@ class GitDriver implements DriverInterface
     /**
      * @param string $tag
      * @param string $path
+     * @param string $branch
      * @throws \Exception
      * @return void
      */
-    public function tag($tag, $path)
+    public function tag($tag, $path, $branch)
     {
         try {
+            $argsPush = ['origin'];
+            $argsPull = [];
+            if ($branch !== null) {
+                $argsPull = ['origin', $branch];
+                $argsPush = ['origin', $branch];
+            }
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-            $this->getGit()->getAdapter()->execute('pull', array(), $path);
-            $this->getGit()->getAdapter()->execute('push', array('origin'), $path);
+            $this->getGit()->getAdapter()->execute('pull', $argsPull, $path);
+            $this->getGit()->getAdapter()->execute('push', $argsPush, $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
             $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);

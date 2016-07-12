@@ -64,6 +64,12 @@ class GitCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'If set, the new version will be generated from beginning of this given version number.',
                 ''
+            )
+            ->addOption(
+                'branch',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Branch-Name: which will be use for tagging the branch'
             );
     }
 
@@ -111,7 +117,7 @@ class GitCommand extends Command
                 $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
             }
 
-            $git->tag($next, $input->getArgument('path'));
+            $git->tag($next, $input->getArgument('path'), $input->getOption('branch'));
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(

@@ -11,9 +11,10 @@ interface DriverInterface
      *
      * @param string $tag
      * @param string $path
+     * @param string $branch
      * @return void
      */
-    public function tag($tag, $path);
+    public function tag($tag, $path, $branch);
 
     /**
      * Returns the latest tag from the given repository.
