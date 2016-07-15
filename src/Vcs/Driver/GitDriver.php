@@ -118,7 +118,7 @@ class GitDriver implements DriverInterface
             throw $e;
         }
 
-        if (null === $diff) {
+        if (null === $diff || "" === $diff) {
             return false;
         }
 

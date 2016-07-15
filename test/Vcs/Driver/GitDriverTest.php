@@ -158,7 +158,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldNotHaveChangesSinceTag()
+    public function shouldNotHaveChangesSinceTagWithNullValueFromGitAdapter()
     {
         $adapter = $this->givenAnAdapter();
 
@@ -183,6 +183,36 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         /** @var GitDriver $driver */
         $this->assertFalse($driver->hasChangesSinceTag('0.2.5', '/home/my/vcs/repo'));
     }
+
+    /**
+     * @test
+     */
+    public function shouldNotHaveChangesSinceTagWithEmptyStringValueFromGitAdapter()
+    {
+        $adapter = $this->givenAnAdapter();
+
+        $adapter->expects($this->once())->method('execute')->with(
+            'diff',
+            array('--ignore-all-space', '0.2.5'),
+            '/home/my/vcs/repo'
+        )->will($this->returnValue(""));
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->once())->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->givenADriver();
+
+        $driver->expects($this->once())->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $this->assertFalse($driver->hasChangesSinceTag('0.2.5', '/home/my/vcs/repo'));
+    }
+
 
     /**
      * @test
