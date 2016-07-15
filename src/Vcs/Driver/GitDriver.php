@@ -49,9 +49,9 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
-            //$this->getGit()->getAdapter()->execute('fetch', ['--all'], $path);
-            //$this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
-            $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
+            $this->getGit()->getAdapter()->execute('fetch', ['--all'], $path);
+            $this->getGit()->getAdapter()->execute('checkout', ['origin/' . $branch], $path);
+            $this->getGit()->getAdapter()->execute('push', ['origin', 'origin/' . $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
             $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
