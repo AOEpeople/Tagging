@@ -73,7 +73,7 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
         } catch (\Exception $e) {
-            if (preg_match("/A branch named .+ already exists/", $e->getMessage()) === 1) {
+            if (preg_match("/branch .+ already exists/", $e->getMessage()) === 1) {
                 $output->writeln(
                     sprintf(
                         '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
