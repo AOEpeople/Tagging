@@ -121,7 +121,8 @@ class GitCommand extends Command
             $git->tag($next, $input->getArgument('path'), $input->getOption('branch'), $output);
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                $output->writeln(sprintf(
+                $output->writeln(
+                    sprintf(
                         '<info>Skip creating tag "%s" because there are no changes since tag "%s"</info>',
                         $next,
                         $latest
