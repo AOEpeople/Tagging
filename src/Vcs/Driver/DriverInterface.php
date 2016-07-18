@@ -2,6 +2,7 @@
 namespace AOE\Tagging\Vcs\Driver;
 
 use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * @package AOE\Tagging\Vcs\Driver
  */
