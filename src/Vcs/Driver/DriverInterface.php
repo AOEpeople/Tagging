@@ -1,6 +1,7 @@
 <?php
 namespace AOE\Tagging\Vcs\Driver;
 
+use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @package AOE\Tagging\Vcs\Driver
  */
@@ -12,9 +13,10 @@ interface DriverInterface
      * @param string $tag
      * @param string $path
      * @param string $branch
+     * @param OutputInterface $output
      * @return void
      */
-    public function tag($tag, $path, $branch);
+    public function tag($tag, $path, $branch, OutputInterface $output);
 
     /**
      * Returns the latest tag from the given repository.

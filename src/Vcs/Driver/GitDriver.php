@@ -4,6 +4,7 @@ namespace AOE\Tagging\Vcs\Driver;
 use Webcreate\Vcs\Common\Adapter\CliAdapter;
 use Webcreate\Vcs\Common\Reference;
 use Webcreate\Vcs\Git;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Wrapper Class for Webcreate\Vcs\Git
@@ -41,22 +42,51 @@ class GitDriver implements DriverInterface
      * @param string $tag
      * @param string $path
      * @param string $branch
+     * @param OutputInterface $output
      * @throws \Exception
      * @return void
      */
-    public function tag($tag, $path, $branch)
+    public function tag($tag, $path, $branch, OutputInterface $output)
     {
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
-            $this->getGit()->getAdapter()->execute('fetch', ['--all'], $path);
-            $this->getGit()->getAdapter()->execute('checkout', ['origin/' . $branch], $path);
-            $this->getGit()->getAdapter()->execute('push', ['origin', 'origin/' . $branch], $path);
+            $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
+            $this->checkoutBranch($branch, $path, $output);
+            $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
             $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
             $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
             throw $e;
+        }
+    }
+
+    /**
+     * @param $branch
+     * @param $path
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    private function checkoutBranch($branch, $path, OutputInterface $output)
+    {
+        try {
+            $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
+        } catch (\Exception $e) {
+            if (preg_match("/A branch named .+ already exists/", $e->getMessage()) === 1) {
+                $output->writeln(
+                    sprintf(
+                        '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
+                        $branch,
+                        'origin/' . $branch,
+                        $branch
+                    )
+                );
+                $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
+                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
+            } else {
+                throw $e;
+            }
         }
     }
 

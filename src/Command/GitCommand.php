@@ -118,12 +118,14 @@ class GitCommand extends Command
                 $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
             }
 
-            $git->tag($next, $input->getArgument('path'), $input->getOption('branch'));
+            $git->tag($next, $input->getArgument('path'), $input->getOption('branch'), $output);
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                $output->writeln(
-                    '<info>Skip creating tag "' . $next .
-                    '" because there are no changes since tag "' . $latest . '"</info>'
+                $output->writeln(sprintf(
+                        '<info>Skip creating tag "%s" because there are no changes since tag "%s"</info>',
+                        $next,
+                        $latest
+                    )
                 );
             }
         }

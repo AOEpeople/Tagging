@@ -2,7 +2,6 @@
 namespace AOE\Tagging\Tests\Vcs\Driver;
 
 use AOE\Tagging\Vcs\Driver\GitDriver;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Webcreate\Vcs\Common\Reference;
 
 /**
@@ -16,6 +15,9 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     public function shouldTagAndPush()
     {
         $adapter = $this->givenAnAdapter();
+        $output = $this->getMockBuilder('Symfony\\Component\\Console\\Output\\OutputInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'tag',
@@ -30,12 +32,24 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
+            'fetch',
+            array('origin'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
+            'checkout',
+            array('-b', 'feature/myBranch', 'origin/feature/myBranch'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(4))->method('execute')->with(
             'push',
             array('origin', 'feature/myBranch'),
             '/home/my/vcs/repo'
         );
 
-        $adapter->expects($this->at(3))->method('execute')->with(
+        $adapter->expects($this->at(5))->method('execute')->with(
             'push',
             array('origin', 'tag', '0.2.5'),
             '/home/my/vcs/repo'
@@ -45,16 +59,84 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(6))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->givenADriver();
 
-        $driver->expects($this->exactly(4))->method('getGit')->will(
+        $driver->expects($this->exactly(6))->method('getGit')->will(
             $this->returnValue($git)
         );
 
         /** @var GitDriver $driver */
-        $driver->tag('0.2.5', '/home/my/vcs/repo', 'feature/myBranch');
+        $driver->tag('0.2.5', '/home/my/vcs/repo', 'feature/myBranch', $output);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldTagAndPushEvenIfLocalBranchAlreadyExists()
+    {
+        $adapter = $this->givenAnAdapter();
+        $output = $this->getMockBuilder('Symfony\\Component\\Console\\Output\\OutputInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $adapter->expects($this->at(0))->method('execute')->with(
+            'tag',
+            array('0.2.5'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(1))->method('execute')->with(
+            'pull',
+            array('origin', 'feature/myBranch'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(2))->method('execute')->with(
+            'fetch',
+            array('origin'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
+            'checkout',
+            array('-b', 'feature/myBranch', 'origin/feature/myBranch'),
+            '/home/my/vcs/repo'
+        )->will($this->throwException(new \Exception('fatal: A branch named feature/myBranch already exists.')));
+
+        $adapter->expects($this->at(4))->method('execute')->with(
+            'checkout',
+            array('feature/myBranch'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(5))->method('execute')->with(
+            'push',
+            array('origin', 'feature/myBranch'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(6))->method('execute')->with(
+            'push',
+            array('origin', 'tag', '0.2.5'),
+            '/home/my/vcs/repo'
+        );
+
+        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getAdapter'))
+            ->getMock();
+        $git->expects($this->exactly(7))->method('getAdapter')->will($this->returnValue($adapter));
+
+        $driver = $this->givenADriver();
+
+        $driver->expects($this->exactly(7))->method('getGit')->will(
+            $this->returnValue($git)
+        );
+
+        /** @var GitDriver $driver */
+        $driver->tag('0.2.5', '/home/my/vcs/repo', 'feature/myBranch', $output);
     }
 
     /**
@@ -64,6 +146,9 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     public function shouldCleanOnError()
     {
         $adapter = $this->givenAnAdapter();
+        $output = $this->getMockBuilder('Symfony\\Component\\Console\\Output\\OutputInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $adapter->expects($this->at(0))->method('execute')->with(
             'tag',
@@ -78,18 +163,30 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
+            'fetch',
+            array('origin'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
+            'checkout',
+            array('-b', 'master', 'origin/master'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(4))->method('execute')->with(
             'push',
             array('origin', 'master'),
             '/home/my/vcs/repo'
         )->will($this->throwException(new \Exception('could not push to remote')));
 
-        $adapter->expects($this->at(3))->method('execute')->with(
+        $adapter->expects($this->at(5))->method('execute')->with(
             'reset',
             array('--hard'),
             '/home/my/vcs/repo'
         );
 
-        $adapter->expects($this->at(4))->method('execute')->with(
+        $adapter->expects($this->at(6))->method('execute')->with(
             'tag',
             array('-d', '0.2.5'),
             '/home/my/vcs/repo'
@@ -99,16 +196,16 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(5))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(7))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->givenADriver();
 
-        $driver->expects($this->exactly(5))->method('getGit')->will(
+        $driver->expects($this->exactly(7))->method('getGit')->will(
             $this->returnValue($git)
         );
 
         /** @var GitDriver $driver */
-        $driver->tag('0.2.5', '/home/my/vcs/repo', 'master');
+        $driver->tag('0.2.5', '/home/my/vcs/repo', 'master', $output);
     }
 
     /**
