@@ -50,7 +50,9 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
-            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
+            if ($branch !== 'master') {
+                $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
+            }
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
