@@ -42,12 +42,18 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
+            'branch',
+            array('myBranch', 'feature/myBranch', '-f'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
             'push',
             array('origin', 'feature/myBranch'),
             '/home/my/vcs/repo'
         );
 
-        $adapter->expects($this->at(3))->method('execute')->with(
+        $adapter->expects($this->at(4))->method('execute')->with(
             'push',
             array('origin', 'tag', '0.2.5'),
             '/home/my/vcs/repo'
@@ -57,11 +63,11 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(4))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->any())->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->givenADriver();
 
-        $driver->expects($this->exactly(4))->method('getGit')->will(
+        $driver->expects($this->any())->method('getGit')->will(
             $this->returnValue($git)
         );
 
@@ -93,18 +99,24 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(2))->method('execute')->with(
+            'branch',
+            array('myBranch', 'feature/myBranch', '-f'),
+            '/home/my/vcs/repo'
+        );
+
+        $adapter->expects($this->at(3))->method('execute')->with(
             'push',
             array('origin', 'master'),
             '/home/my/vcs/repo'
         )->will($this->throwException(new \Exception('could not push to remote')));
 
-        $adapter->expects($this->at(3))->method('execute')->with(
+        $adapter->expects($this->at(4))->method('execute')->with(
             'reset',
             array('--hard'),
             '/home/my/vcs/repo'
         );
 
-        $adapter->expects($this->at(4))->method('execute')->with(
+        $adapter->expects($this->at(5))->method('execute')->with(
             'tag',
             array('-d', '0.2.5'),
             '/home/my/vcs/repo'
@@ -114,11 +126,11 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getAdapter'))
             ->getMock();
-        $git->expects($this->exactly(5))->method('getAdapter')->will($this->returnValue($adapter));
+        $git->expects($this->exactly(6))->method('getAdapter')->will($this->returnValue($adapter));
 
         $driver = $this->givenADriver();
 
-        $driver->expects($this->exactly(5))->method('getGit')->will(
+        $driver->expects($this->exactly(6))->method('getGit')->will(
             $this->returnValue($git)
         );
 

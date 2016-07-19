@@ -50,6 +50,7 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
+            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
@@ -112,7 +113,6 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
             $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
