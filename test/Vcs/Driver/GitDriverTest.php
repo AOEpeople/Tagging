@@ -187,8 +187,8 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
+            'branch',
+            array('master', 'origin/master', '-fq'),
             '/home/my/vcs/repo'
         );
 
@@ -217,95 +217,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function shouldCheckoutLocalBranchIfItAlreadyExists()
-    {
-        $adapter = $this->givenAnAdapter();
-        $output = $this->getMockBuilder('Symfony\\Component\\Console\\Output\\OutputInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $adapter->expects($this->at(0))->method('execute')->with(
-            'fetch',
-            array('origin'),
-            '/home/my/vcs/repo'
-        );
-
-        $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
-            '/home/my/vcs/repo'
-        )->willThrowException(new \Exception('fatal: branch master already exists'));
-
-        $adapter->expects($this->at(2))->method('execute')->with(
-            'checkout',
-            array('master'),
-            '/home/my/vcs/repo'
-        );
-
-        $adapter->expects($this->at(3))->method('execute')->with(
-            'diff',
-            array('--ignore-all-space', '0.2.5'),
-            '/home/my/vcs/repo'
-        )->will($this->returnValue(null));
-
-        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getAdapter'))
-            ->getMock();
-        $git->expects($this->any())->method('getAdapter')->will($this->returnValue($adapter));
-
-        $driver = $this->givenADriver();
-
-        $driver->expects($this->any())->method('getGit')->will(
-            $this->returnValue($git)
-        );
-
-        /** @var GitDriver $driver */
-        $driver->hasChangesSinceTag('0.2.5', 'master', '/home/my/vcs/repo', $output);
-    }
-
-    /**
-     * @test
-     * @expectedException \Exception
-     */
-    public function shouldThrowExceptionWhileTryingToCheckoutBranch()
-    {
-        $adapter = $this->givenAnAdapter();
-        $output = $this->getMockBuilder('Symfony\\Component\\Console\\Output\\OutputInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $adapter->expects($this->at(0))->method('execute')->with(
-            'fetch',
-            array('origin'),
-            '/home/my/vcs/repo'
-        );
-
-        $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
-            '/home/my/vcs/repo'
-        )->willThrowException(new \Exception('fatal: something is wrong'));
-
-        $git = $this->getMockBuilder('Webcreate\\Vcs\\Git')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getAdapter'))
-            ->getMock();
-        $git->expects($this->any())->method('getAdapter')->will($this->returnValue($adapter));
-
-        $driver = $this->givenADriver();
-
-        $driver->expects($this->any())->method('getGit')->will(
-            $this->returnValue($git)
-        );
-
-        /** @var GitDriver $driver */
-        $driver->hasChangesSinceTag('0.2.5', 'master', '/home/my/vcs/repo', $output);
-    }
-
-    /**
-     * @test
-     */
     public function shouldNotHaveChangesSinceTagWithEmptyStringValueFromGitAdapter()
     {
         $adapter = $this->givenAnAdapter();
@@ -320,8 +231,8 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
+            'branch',
+            array('master', 'origin/master', '-fq'),
             '/home/my/vcs/repo'
         );
 
@@ -365,8 +276,8 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
+            'branch',
+            array('master', 'origin/master', '-fq'),
             '/home/my/vcs/repo'
         );
 
@@ -417,8 +328,8 @@ index 56a6051..d2b3621 100644
         );
 
         $adapter->expects($this->at(1))->method('execute')->with(
-            'checkout',
-            array('-b', 'master', 'origin/master'),
+            'branch',
+            array('master', 'origin/master', '-fq'),
             '/home/my/vcs/repo'
         );
 

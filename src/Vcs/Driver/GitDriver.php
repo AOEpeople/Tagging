@@ -112,7 +112,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $this->checkoutBranch($branch, $path, $output);
+            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-fq'], $path);
             $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
@@ -126,34 +126,6 @@ class GitDriver implements DriverInterface
         }
 
         return true;
-    }
-
-    /**
-     * @param $branch
-     * @param $path
-     * @param OutputInterface $output
-     * @throws \Exception
-     */
-    private function checkoutBranch($branch, $path, OutputInterface $output)
-    {
-        try {
-            $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
-        } catch (\Exception $e) {
-            if (preg_match("/branch .+ already exists/", $e->getMessage()) === 1) {
-                $output->writeln(
-                    sprintf(
-                        '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
-                        $branch,
-                        'origin/' . $branch,
-                        $branch
-                    )
-                );
-                $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
-                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
-            } else {
-                throw $e;
-            }
-        }
     }
 
     /**
