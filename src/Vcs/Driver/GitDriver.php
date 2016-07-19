@@ -112,7 +112,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-fq'], $path);
+            $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
             $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {

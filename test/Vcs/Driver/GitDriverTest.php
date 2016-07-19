@@ -188,7 +188,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'branch',
-            array('master', 'origin/master', '-fq'),
+            array('master', 'origin/master', '-f'),
             '/home/my/vcs/repo'
         );
 
@@ -232,7 +232,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'branch',
-            array('master', 'origin/master', '-fq'),
+            array('master', 'origin/master', '-f'),
             '/home/my/vcs/repo'
         );
 
@@ -277,7 +277,7 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'branch',
-            array('master', 'origin/master', '-fq'),
+            array('master', 'origin/master', '-f'),
             '/home/my/vcs/repo'
         );
 
@@ -329,7 +329,7 @@ index 56a6051..d2b3621 100644
 
         $adapter->expects($this->at(1))->method('execute')->with(
             'branch',
-            array('master', 'origin/master', '-fq'),
+            array('master', 'origin/master', '-f'),
             '/home/my/vcs/repo'
         );
 
