@@ -40,53 +40,22 @@ class GitDriver implements DriverInterface
 
     /**
      * @param string $tag
-     * @param string $path
      * @param string $branch
-     * @param OutputInterface $output
+     * @param string $path
      * @throws \Exception
      * @return void
      */
-    public function tag($tag, $path, $branch, OutputInterface $output)
+    public function tag($tag, $branch, $path)
     {
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
-            $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $this->checkoutBranch($branch, $path, $output);
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
             $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
             $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
             throw $e;
-        }
-    }
-
-    /**
-     * @param $branch
-     * @param $path
-     * @param OutputInterface $output
-     * @throws \Exception
-     */
-    private function checkoutBranch($branch, $path, OutputInterface $output)
-    {
-        try {
-            $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
-        } catch (\Exception $e) {
-            if (preg_match("/branch .+ already exists/", $e->getMessage()) === 1) {
-                $output->writeln(
-                    sprintf(
-                        '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
-                        $branch,
-                        'origin/' . $branch,
-                        $branch
-                    )
-                );
-                $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
-                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
-            } else {
-                throw $e;
-            }
         }
     }
 
@@ -134,12 +103,16 @@ class GitDriver implements DriverInterface
 
     /**
      * @param string $tag
+     * @param string $branch
      * @param string $path
+     * @param OutputInterface $output
      * @return boolean
      */
-    public function hasChangesSinceTag($tag, $path)
+    public function hasChangesSinceTag($tag, $branch, $path, OutputInterface $output)
     {
         try {
+            $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
+            $this->checkoutBranch($branch, $path, $output);
             $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
@@ -153,6 +126,34 @@ class GitDriver implements DriverInterface
         }
 
         return true;
+    }
+
+    /**
+     * @param $branch
+     * @param $path
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    private function checkoutBranch($branch, $path, OutputInterface $output)
+    {
+        try {
+            $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
+        } catch (\Exception $e) {
+            if (preg_match("/branch .+ already exists/", $e->getMessage()) === 1) {
+                $output->writeln(
+                    sprintf(
+                        '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
+                        $branch,
+                        'origin/' . $branch,
+                        $branch
+                    )
+                );
+                $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
+                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
+            } else {
+                throw $e;
+            }
+        }
     }
 
     /**

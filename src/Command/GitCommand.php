@@ -92,14 +92,14 @@ class GitCommand extends Command
         $next = $version->increase($latest, $input->getOption('version-type'));
 
         if ($input->getOption('evaluate')) {
-            if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
+            if ($git->hasChangesSinceTag($latest, $input->getOption('branch'), $input->getArgument('path'), $output)) {
                 $output->write($next);
             }
 
             return;
         }
 
-        if ($git->hasChangesSinceTag($latest, $input->getArgument('path'))) {
+        if ($git->hasChangesSinceTag($latest, $input->getOption('branch'), $input->getArgument('path'), $output)) {
             if ($input->getOption('commit-and-push')) {
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(
@@ -118,7 +118,7 @@ class GitCommand extends Command
                 $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
             }
 
-            $git->tag($next, $input->getArgument('path'), $input->getOption('branch'), $output);
+            $git->tag($next, $input->getOption('branch'), $input->getArgument('path'));
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(

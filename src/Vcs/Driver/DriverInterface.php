@@ -12,12 +12,11 @@ interface DriverInterface
      * Creates a Tag and push the specific tag into the remote.
      *
      * @param string $tag
-     * @param string $path
      * @param string $branch
-     * @param OutputInterface $output
+     * @param string $path
      * @return void
      */
-    public function tag($tag, $path, $branch, OutputInterface $output);
+    public function tag($tag, $branch, $path);
 
     /**
      * Returns the latest tag from the given repository.
@@ -31,10 +30,12 @@ interface DriverInterface
      * Returns true if the repository has changed since the last tag.
      *
      * @param string $tag
+     * @param string $branch
      * @param string $path
+     * @param OutputInterface $output
      * @return boolean
      */
-    public function hasChangesSinceTag($tag, $path);
+    public function hasChangesSinceTag($tag, $branch, $path, OutputInterface $output);
 
     /**
      * Commits given files into the remote repository.

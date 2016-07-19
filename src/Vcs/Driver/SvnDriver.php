@@ -1,6 +1,8 @@
 <?php
 namespace AOE\Tagging\Vcs\Driver;
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * @package AOE\Tagging\Vcs\Driver
  */
@@ -8,11 +10,11 @@ class SvnDriver implements DriverInterface
 {
     /**
      * @param string $tag
-     * @param string $path
      * @param string $branch
+     * @param string $path
      * @return void
      */
-    public function tag($tag, $path, $branch)
+    public function tag($tag, $branch, $path)
     {
         // TODO: Implement tag() method.
     }
@@ -27,10 +29,12 @@ class SvnDriver implements DriverInterface
 
     /**
      * @param string $tag
+     * @param string $branch
      * @param string $path
+     * @param OutputInterface $output
      * @return boolean
      */
-    public function hasChangesSinceTag($tag, $path)
+    public function hasChangesSinceTag($tag, $branch, $path, OutputInterface $output)
     {
         // TODO: Implement hasChangesSinceTag() method.
     }
