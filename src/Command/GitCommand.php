@@ -104,6 +104,7 @@ class GitCommand extends Command
             
             if ($branch !== 'master') {
                 $git->checkoutBranch($branch, $path, $output);
+                $output->writeln('<info>'.$branch.' der ausgecheckt werden sollte</info>');
             }
             
             if ($input->getOption('commit-and-push')) {
