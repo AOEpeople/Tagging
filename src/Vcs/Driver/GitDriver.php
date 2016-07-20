@@ -67,7 +67,7 @@ class GitDriver implements DriverInterface
      */
     public function checkoutBranch($branch, $path, OutputInterface $output)
     {
-        $this->getGit()->getAdapter()->execute('stash', $path);
+        $this->getGit()->getAdapter()->execute('stash',[], $path);
         try {
             $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
             $output->writeln('<info>'.$branch.' erfolgreich ausgecheckt</info>');
