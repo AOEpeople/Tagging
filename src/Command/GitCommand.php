@@ -101,7 +101,6 @@ class GitCommand extends Command
         }
 
         if ($git->hasChangesSinceTag($latest, $branch, $path, $output)) {
-            
             if ($branch !== 'master') {
                 $git->checkoutBranch($branch, $path, $output);
                 $output->writeln('<info>'.$branch.' der ausgecheckt werden sollte</info>');
