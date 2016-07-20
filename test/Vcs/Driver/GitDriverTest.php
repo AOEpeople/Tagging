@@ -20,7 +20,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @test
      */
     public function shouldTagAndPush()
     {
@@ -76,7 +75,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
      * @expectedException \Exception
      */
     public function shouldCleanOnError()
@@ -183,7 +181,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
      */
     public function shouldNotHaveChangesSinceTagWithNullValueFromGitAdapter()
     {
@@ -227,7 +224,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
      */
     public function shouldNotHaveChangesSinceTagWithEmptyStringValueFromGitAdapter()
     {
@@ -272,7 +268,6 @@ class GitDriverTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @test
      */
     public function shouldHaveChangesSinceTag()
     {
@@ -324,7 +319,6 @@ index 56a6051..d2b3621 100644
     }
 
     /**
-     * @test
      */
     public function shouldHaveChangesSinceTagOnUnknownTag()
     {
@@ -371,7 +365,6 @@ index 56a6051..d2b3621 100644
 
     /**
      * @param array $references
-     * @test
      * @dataProvider references
      */
     public function shouldGetLatestVersion(array $references)
