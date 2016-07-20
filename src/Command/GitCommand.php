@@ -82,6 +82,8 @@ class GitCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $git = $this->getDriver($input->getArgument('url'));
+        $branch = $input->getOption('branch');
+        $path = $input->getArgument('path');
         $version = new Version();
 
         if ($input->getOption('from-version')) {
@@ -92,14 +94,18 @@ class GitCommand extends Command
         $next = $version->increase($latest, $input->getOption('version-type'));
 
         if ($input->getOption('evaluate')) {
-            if ($git->hasChangesSinceTag($latest, $input->getOption('branch'), $input->getArgument('path'), $output)) {
+            if ($git->hasChangesSinceTag($latest, $branch, $path, $output)) {
                 $output->write($next);
             }
-
             return;
         }
 
-        if ($git->hasChangesSinceTag($latest, $input->getOption('branch'), $input->getArgument('path'), $output)) {
+        if ($git->hasChangesSinceTag($latest, $branch, $path, $output)) {
+            
+            if ($branch !== 'master') {
+                $git->checkoutBranch($branch, $path, $output);
+            }
+            
             if ($input->getOption('commit-and-push')) {
                 if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                     $output->writeln(
@@ -108,7 +114,7 @@ class GitCommand extends Command
                 }
                 $git->commit(
                     $input->getOption('commit-and-push'),
-                    $input->getArgument('path'),
+                    $path,
                     $input->getOption('message')
                 );
             }
@@ -118,7 +124,7 @@ class GitCommand extends Command
                 $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
             }
 
-            $git->tag($next, $input->getOption('branch'), $input->getArgument('path'));
+            $git->tag($next, $branch, $path);
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(

@@ -50,15 +50,40 @@ class GitDriver implements DriverInterface
         try {
             $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
             $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
-            if ($branch !== 'master') {
-                $this->getGit()->getAdapter()->execute('branch', [$branch ,'origin/' . $branch, '-f'], $path);
-            }
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
         } catch (\Exception $e) {
             $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
             $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
             throw $e;
+        }
+    }
+
+    /**
+     * @param $branch
+     * @param $path
+     * @param OutputInterface $output
+     * @throws \Exception
+     */
+    public function checkoutBranch($branch, $path, OutputInterface $output)
+    {
+        try {
+            $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
+        } catch (\Exception $e) {
+            if (preg_match("/A branch named .+ already exists/", $e->getMessage()) === 1) {
+                $output->writeln(
+                    sprintf(
+                        '<info>checkout -b %s %s failed, because local branch "%s" already exists</info>',
+                        $branch,
+                        'origin/' . $branch,
+                        $branch
+                    )
+                );
+                $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
+                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
+            } else {
+                throw $e;
+            }
         }
     }
 
@@ -115,7 +140,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag), $path);
+            $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag, $branch), $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
                 return true;
