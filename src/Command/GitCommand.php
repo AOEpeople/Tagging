@@ -71,6 +71,12 @@ class GitCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Branch-Name: which will be use for tagging the branch',
                 'master'
+            )
+            ->addOption(
+                'switch-branch',
+                'swb',
+                InputOption::VALUE_NONE,
+                'Option that triggers the git client to switch to the specified branch'
             );
     }
 
@@ -84,13 +90,14 @@ class GitCommand extends Command
         $git = $this->getDriver($input->getArgument('url'));
         $branch = $input->getOption('branch');
         $path = $input->getArgument('path');
-        $version = new Version();
 
-        if ($input->getOption('from-version')) {
-            $latest = $input->getOption('from-version');
-        } else {
-            $latest = $git->getLatestTag();
+        if ($input->getOption('switch-branch')) {
+            $git->checkoutBranch($branch, $path, $output);
+            return;
         }
+
+        $version = new Version();
+        $latest = $this->getLatestVersion($input, $git);
         $next = $version->increase($latest, $input->getOption('version-type'));
 
         if ($input->getOption('evaluate')) {
@@ -101,30 +108,7 @@ class GitCommand extends Command
         }
 
         if ($git->hasChangesSinceTag($latest, $branch, $path, $output)) {
-            if ($branch !== 'master') {
-                $git->checkoutBranch($branch, $path, $output);
-                $output->writeln('<info>'.$branch.' der ausgecheckt werden sollte</info>');
-            }
-            
-            if ($input->getOption('commit-and-push')) {
-                if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                    $output->writeln(
-                        '<info>commit and push: "' . implode(' ', $input->getOption('commit-and-push')) . '"</info>'
-                    );
-                }
-                $git->commit(
-                    $input->getOption('commit-and-push'),
-                    $path,
-                    $input->getOption('message')
-                );
-            }
-
-            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                $output->writeln('<info>Latest Tag number is "' . $latest . '"</info>');
-                $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
-            }
-
-            $git->tag($next, $branch, $path);
+            $this->handleChanges($input, $output, $git, $path, $latest, $next, $branch);
         } else {
             if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
                 $output->writeln(
@@ -135,6 +119,60 @@ class GitCommand extends Command
                     )
                 );
             }
+        }
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param GitDriver $git
+     * @param $path
+     * @param $latest
+     * @param $next
+     * @param $branch
+     * @throws \Exception
+     */
+    private function handleChanges(
+        InputInterface $input,
+        OutputInterface $output,
+        GitDriver $git,
+        $path,
+        $latest,
+        $next,
+        $branch
+    ) {
+        if ($input->getOption('commit-and-push')) {
+            if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                $output->writeln(
+                    '<info>commit and push: "' . implode(' ', $input->getOption('commit-and-push')) . '"</info>'
+                );
+            }
+            $git->commit(
+                $input->getOption('commit-and-push'),
+                $path,
+                $input->getOption('message')
+            );
+        }
+
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+            $output->writeln('<info>Latest Tag number is "' . $latest . '"</info>');
+            $output->writeln('<info>Next Tag number is "' . $next . '"</info>');
+        }
+
+        $git->tag($next, $branch, $path);
+    }
+
+    /**
+     * @param InputInterface $input
+     * @param GitDriver $git
+     * @return mixed|string
+     */
+    private function getLatestVersion(InputInterface $input, GitDriver $git)
+    {
+        if ($input->getOption('from-version')) {
+            return $latest = $input->getOption('from-version');
+        } else {
+            return $latest = $git->getLatestTag();
         }
     }
 

@@ -67,7 +67,6 @@ class GitDriver implements DriverInterface
      */
     public function checkoutBranch($branch, $path, OutputInterface $output)
     {
-        $this->getGit()->getAdapter()->execute('stash',[], $path);
         try {
             $this->getGit()->getAdapter()->execute('checkout', ['-b', $branch ,'origin/' . $branch], $path);
             $output->writeln('<info>'.$branch.' erfolgreich ausgecheckt</info>');
@@ -82,12 +81,11 @@ class GitDriver implements DriverInterface
                     )
                 );
                 $this->getGit()->getAdapter()->execute('checkout', [$branch], $path);
-                $output->writeln('<info>checkout local branch: "'. $branch .'"</info>');
+                $output->writeln('<info>checking out local branch: "'. $branch .'"</info>');
             } else {
                 throw $e;
             }
         }
-        $this->getGit()->getAdapter()->execute('stash', ['pop'], $path);
     }
 
     /**
