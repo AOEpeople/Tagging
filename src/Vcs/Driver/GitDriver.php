@@ -60,8 +60,8 @@ class GitDriver implements DriverInterface
     }
 
     /**
-     * @param $branch
-     * @param $path
+     * @param string $branch
+     * @param string $path
      * @param OutputInterface $output
      * @throws \Exception
      */

@@ -2,6 +2,8 @@
 namespace AOE\Tagging\Tests\Command;
 
 use AOE\Tagging\Command\GitCommand;
+use AOE\Tagging\Tests\TaggingPHPUnitTestCase;
+use AOE\Tagging\Vcs\Driver\GitDriver;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -9,7 +11,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 /**
  * @package AOE\Tagging\Tests\Vcs
  */
-class GitCommandTest extends \PHPUnit_Framework_TestCase
+class GitCommandTest extends TaggingPHPUnitTestCase
 {
     /**
      * @test
@@ -296,6 +298,43 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function shouldWriteCommitAndPushInfoWithVerbosityVerbose()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getLatestTag', 'tag', 'hasChangesSinceTag', 'commit'))
+            ->getMock();
+        $gitDriver->expects($this->once())->method('hasChangesSinceTag')->will($this->returnValue(true));
+        $gitDriver->expects($this->once())->method('getLatestTag')->will($this->returnValue('2.7.3'));
+        $gitDriver->expects($this->once())->method('commit')
+            ->with(array('myfile.ext'), '/home/foo/bar', 'my message for commit');
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $test = $commandTester->getOutput();
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--commit-and-push' => array('myfile.ext'),
+                '--message' => 'my message for commit'
+            ),
+            ['verbosity' => 2]
+        );
+    }
+
+    /**
+     * @test
+     */
     public function shouldEvaluateVersionNumberIfChangesDetected()
     {
         $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
@@ -374,5 +413,48 @@ class GitCommandTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEmpty($commandTester->getDisplay());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldCheckoutBranchWithSwitchBranchOptionWhenExecuting()
+    {
+        $gitDriver = $this->getMockBuilder('AOE\\Tagging\\Vcs\\Driver\\GitDriver')
+            ->disableOriginalConstructor()
+            ->setMethods(array('checkoutBranch'))
+            ->getMock();
+
+        $gitDriver->expects($this->once())->method('checkoutBranch');
+
+        $gitCommand = $this->getMockBuilder('AOE\\Tagging\\Command\\GitCommand')
+            ->setMethods(array('getDriver'))
+            ->getMock();
+        $gitCommand->expects($this->once())->method('getDriver')->will($this->returnValue($gitDriver));
+
+        /** @var GitCommand $gitCommand */
+        $application = new Application();
+        $application->add($gitCommand);
+
+        $command = $application->find('git');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                'url' => 'git@git.test.test/foo/bar',
+                'path' => '/home/foo/bar',
+                '--switch-branch' => null
+            )
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function shouldGetDriver()
+    {
+        $gitCommand = new GitCommand();
+        $driver = $this->invokeMethod($gitCommand, 'getDriver',['https://url']);
+        $this->assertInstanceOf(GitDriver::class, $driver);
     }
 }
