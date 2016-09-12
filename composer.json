@@ -28,7 +28,7 @@
     "autoload": {
         "psr-4": {
             "AOE\\Tagging\\": "src/",
-            "AOE\\Tagging\\Tests\\": "test /"
+            "AOE\\Tagging\\Tests\\": "test/"
         }
     },
     "bin": [
