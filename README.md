@@ -92,8 +92,15 @@ You can set the `--evaluate` option to find out which tag/version will be create
     php bin/tagging git https://github.com/company/package.git /path/to/local/checkout --evaluate
 
 
-### Tagging for Branches
+### Tagging for branches
 
 Sometimes we even need to tag branches, e.g. after you have pushed a bugfix to your branch instead of pushing it into master. For this case, its enough to set the option with branch name: `--branch`.
 
     php bin/tagging git https://github.com/company/package.git /path/to/local/branch-checkout --branch=myBranchName
+
+
+### Checking out a specified branch
+
+In case you have any changes that need to be commited and pushed to a specific branch you have to checkout the specific branch before commiting and pushing. This can be achieved by adding the option: `--switch-branch`. But to be able to check out a specific branch, you have to specify the branch name with `--branch` too.
+
+    php bin/tagging git https://github.com/company/package.git /path/to/local/branch-checkout --branch=myBranchName --switch-branch
