@@ -127,7 +127,7 @@ class GitDriver implements DriverInterface
             return '0.0.0';
         }
 
-        return call_user_func('end', array_values($tags));
+        return array_pop($tags);
     }
 
     /**
