@@ -48,13 +48,13 @@ class GitDriver implements DriverInterface
     public function tag($tag, $branch, $path)
     {
         try {
-            $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-            $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
+            $this->getGit()->getAdapter()->execute('tag', [$tag], $path);
+            $this->getGit()->getAdapter()->execute('pull', ['--rebase', 'origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
-            $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
+            $this->getGit()->getAdapter()->execute('push', ['origin', 'tag', $tag], $path);
         } catch (\Exception $e) {
-            $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
-            $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
+            $this->getGit()->getAdapter()->execute('reset', ['--hard'], $path);
+            $this->getGit()->getAdapter()->execute('tag', ['-d', $tag], $path);
             throw $e;
         }
     }
