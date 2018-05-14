@@ -98,7 +98,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('add', $files, $path);
-            $this->getGit()->getAdapter()->execute('commit', array_merge(array('-m', $message), $files), $path);
+            $this->getGit()->getAdapter()->execute('commit', array_merge(['-m', $message], $files), $path);
         } catch (\Exception $e) {
             if (false !== strpos($e->getMessage(), 'nothing to commit')) {
                 return;
@@ -115,7 +115,7 @@ class GitDriver implements DriverInterface
      */
     public function getLatestTag()
     {
-        $tags = array();
+        $tags = [];
         foreach ($this->getGit()->tags() as $reference) {
             /** @var Reference $reference */
             $tags[] = $reference->getName();
@@ -141,7 +141,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag, $branch), $path);
+            $diff = $this->getGit()->getAdapter()->execute('diff', ['--ignore-all-space', $tag, $branch], $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
                 return true;
