@@ -12,7 +12,7 @@ class TaggingPHPUnitTestCase extends \PHPUnit_Framework_TestCase
      *
      * @return mixed Method return.
      */
-    protected function invokeMethod(&$object, $methodName, array $parameters = array())
+    protected function invokeMethod(&$object, $methodName, array $parameters = [])
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method = $reflection->getMethod($methodName);

@@ -48,13 +48,13 @@ class GitDriver implements DriverInterface
     public function tag($tag, $branch, $path)
     {
         try {
-            $this->getGit()->getAdapter()->execute('tag', array($tag), $path);
-            $this->getGit()->getAdapter()->execute('pull', ['origin', $branch], $path);
+            $this->getGit()->getAdapter()->execute('tag', [$tag], $path);
+            $this->getGit()->getAdapter()->execute('pull', ['--rebase', 'origin', $branch], $path);
             $this->getGit()->getAdapter()->execute('push', ['origin', $branch], $path);
-            $this->getGit()->getAdapter()->execute('push', array('origin', 'tag', $tag), $path);
+            $this->getGit()->getAdapter()->execute('push', ['origin', 'tag', $tag], $path);
         } catch (\Exception $e) {
-            $this->getGit()->getAdapter()->execute('reset', array('--hard'), $path);
-            $this->getGit()->getAdapter()->execute('tag', array('-d', $tag), $path);
+            $this->getGit()->getAdapter()->execute('reset', ['--hard'], $path);
+            $this->getGit()->getAdapter()->execute('tag', ['-d', $tag], $path);
             throw $e;
         }
     }
@@ -98,7 +98,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('add', $files, $path);
-            $this->getGit()->getAdapter()->execute('commit', array_merge(array('-m', $message), $files), $path);
+            $this->getGit()->getAdapter()->execute('commit', array_merge(['-m', $message], $files), $path);
         } catch (\Exception $e) {
             if (false !== strpos($e->getMessage(), 'nothing to commit')) {
                 return;
@@ -115,7 +115,7 @@ class GitDriver implements DriverInterface
      */
     public function getLatestTag()
     {
-        $tags = array();
+        $tags = [];
         foreach ($this->getGit()->tags() as $reference) {
             /** @var Reference $reference */
             $tags[] = $reference->getName();
@@ -141,7 +141,7 @@ class GitDriver implements DriverInterface
     {
         try {
             $this->getGit()->getAdapter()->execute('fetch', ['origin'], $path);
-            $diff = $this->getGit()->getAdapter()->execute('diff', array('--ignore-all-space', $tag, $branch), $path);
+            $diff = $this->getGit()->getAdapter()->execute('diff', ['--ignore-all-space', $tag, $branch], $path);
         } catch (\RuntimeException $e) {
             if (false !== strpos($e->getMessage(), 'unknown revision or path')) {
                 return true;
