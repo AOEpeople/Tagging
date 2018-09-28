@@ -8,7 +8,7 @@ You are be able configure the version type to increase. For example "major" or "
 Features:
  - Follows the semantic versioning pattern
  - Major, minor and patch version are supported
- - GIT integration (SVN currently not implemented, but will be come shortly)
+ - GIT integration
  - Commit (and push) additional files before creating a new tag/version
  - Dry run. Just evaluate the next tag/version
 
